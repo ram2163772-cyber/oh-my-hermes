@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.1.0 — 2026-05-09
+
+### Added
+
+**Skills**
+- `manage-github-issues` — triage, create, label, assign, and close GitHub issues via `gh` CLI
+- `create-github-pr` — creates PR from feature branch with description drawn from Hermes memory
+
+**Workflows**
+- `github-ops` — full GitHub ops loop: triage issues → implement → PR → preview deploy → merge
+
+### Changed
+
+- All 13 existing skills rewritten with CSO-optimized descriptions (all start "Use when...")
+- Descriptions now describe triggering conditions only — no workflow summaries
+- All skills under 350 words for Hermes memory efficiency
+
+---
+
 ## 1.0.0 — 2026-05-09
 
 ### Added

@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-4ade80?style=flat-square)](https://github.com/salomondiei08/oh-my-hermes/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Hermes](https://img.shields.io/badge/Hermes-v0.9%2B-orange?style=flat-square)](https://hermes-agent.nousresearch.com)
-[![Skills](https://img.shields.io/badge/skills-13-brightgreen?style=flat-square)](#skills-included)
+[![Skills](https://img.shields.io/badge/skills-15-brightgreen?style=flat-square)](#skills-included)
 [![Stack](https://img.shields.io/badge/stack-Markdown%20%2B%20Bash-zinc?style=flat-square)](#)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black?style=flat-square)](https://vercel.com)
 [![DB](https://img.shields.io/badge/db-Supabase-3ecf8e?style=flat-square)](https://supabase.com)
@@ -47,7 +47,7 @@ Hermes Agent has persistent memory, autonomous skill generation, 19+ messaging p
 
 Oh My Hermes fills that gap with:
 
-- **13 skills** — tested workflow skills covering the full app lifecycle
+- **15 skills** — tested workflow skills covering the full app lifecycle and GitHub ops
 - **Hermes-native framing** — designed for Hermes as the primary operator, not as a routing layer requiring human intervention
 - **VPS-ready** — works with Hermes running on a $5/month server or your local machine
 - **Conventions** — AGENTS.md templates and project structure standards
@@ -116,7 +116,7 @@ RUNNING APP — Hermes watches it
 curl -fsSL https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/install.sh | bash
 ```
 
-Installs 13 skills and 3 workflows to `~/.hermes/skills/` and `~/.hermes/workflows/`.
+Installs 15 skills and 4 workflows to `~/.hermes/skills/` and `~/.hermes/workflows/`.
 
 ### Bootstrap a new project
 
@@ -181,6 +181,8 @@ bash /tmp/oh-my-hermes/scripts/bootstrap.sh
 | `health-check` | Calls `/api/health`, validates response, reports status |
 | `send-notification` | Sends Slack webhook with deployment or status info |
 | `post-deploy-followup` | Health check + deployment log + notification + summary |
+| `manage-github-issues` | Triage, create, label, assign, and close GitHub issues |
+| `create-github-pr` | Creates PR from feature branch with memory-drawn description |
 
 ---
 
@@ -307,7 +309,7 @@ Claude Code and Codex are optional. Hermes handles the full workflow without the
 ## Roadmap
 
 **V1 — current**
-13 skills, 3 workflows, AGENTS.md conventions, Vercel + Supabase integration, scripts, full docs, example app.
+15 skills, 4 workflows, AGENTS.md conventions, Vercel + Supabase + GitHub ops integration, scripts, full docs, example app.
 
 **V2 — planned**
 Cron-based health monitoring (Hermes watches production on a schedule), incident creation skill, post-deploy automated tests, staging → production promotion workflow.

@@ -1,47 +1,52 @@
 ---
 name: implement-with-codex
-description: Scaffold a Codex CLI invocation with full context for targeted single-file or quick-fix tasks
+description: Use when choose-engine has routed to Codex for a targeted single-file or quick-fix task
 version: 1.0.0
 tags: [implementation, codex, coding]
 ---
 
+## Overview
+
+Composes a self-contained Codex CLI command. Codex context is per-invocation — every relevant detail must be in the command string.
+
 ## When to Use
 
-When `choose-engine` has routed a task to Codex. Use for quick targeted fixes, single-file changes, exploratory prototypes, and well-defined small tasks.
+- `choose-engine` routed the task here
+- Task is 1-2 files, well-scoped, location known
+- Quick bug fix in a specific function
 
 ## Prerequisites
 
 - Codex CLI installed (`npm install -g @openai/codex`)
-- Task description is specific and well-scoped
-- OPENAI_API_KEY set in environment
+- `OPENAI_API_KEY` set in environment
+- Task description is specific and scoped
 
 ## Procedure
 
-1. Retrieve any relevant context from Hermes memory (architecture decisions, the specific file and function in question)
+1. Retrieve relevant context from Hermes memory (architecture decisions, specific file and function)
 
-2. Compose the Codex command. Codex context is per-invocation — ALL relevant context must be in the command string:
+2. Compose the Codex command — ALL context in the string:
    ```bash
-   codex "[full task description with all context]"
+   codex "[file path], [what is wrong], [how to fix it], [do not change other files]"
    ```
 
-   Example of a good Codex prompt:
+   Example:
    ```bash
-   codex "In src/middleware.ts, the auth redirect is sending users to /login even when they are authenticated. The auth check uses supabase.auth.getSession(). Fix the condition so authenticated users are redirected to /dashboard instead of /login. Do not change any other files."
+   codex "In src/middleware.ts, auth redirect sends users to /login even when authenticated. The check uses supabase.auth.getSession(). Fix the condition so authenticated users go to /dashboard instead. Do not change other files."
    ```
 
-3. Provide the exact `codex` command to the user or execute it directly if in an automated context
+3. Provide the exact command to the user (or execute directly in automated context)
 
-4. After completion, save outcome to Hermes memory
+4. After completion: save outcome to Hermes memory
 
 ## Pitfalls
 
-- Codex has no persistent context — every invocation starts fresh. Put ALL relevant context in the prompt string.
-- Scope the task tightly. If it expands to 3+ files during implementation, stop and route to Claude Code instead.
-- Codex works best when the file and function are named explicitly in the prompt.
+- Every invocation starts fresh. Put ALL relevant context in the prompt string — no persistent state.
+- Scope tightly. If the task expands to 3+ files, stop and load `implement-with-claude-code` instead.
+- Name the file and function explicitly in the prompt.
 
 ## Verification
 
-After Codex completes:
-- Confirm the specific file was changed as expected
-- Run the build or typecheck to confirm no regressions: `npm run typecheck`
-- Save outcome to Hermes memory
+- Specific file changed as expected
+- Build/typecheck passes: `npm run typecheck`
+- Outcome saved to Hermes memory

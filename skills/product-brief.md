@@ -1,13 +1,19 @@
 ---
 name: product-brief
-description: Generate a written product brief from clarified requirements and save it to Hermes memory and PRODUCT_BRIEF.md
+description: Use when requirements are saved to Hermes memory and a written artifact is needed before implementation or design begins
 version: 1.0.0
 tags: [planning, brief, memory]
 ---
 
+## Overview
+
+Transforms raw requirements from Hermes memory into a structured product brief. Writes PRODUCT_BRIEF.md as a shareable artifact.
+
 ## When to Use
 
-After `clarify-requirements` has run and answers are saved to Hermes memory. Creates a written artifact that can be handed to a coding engine or shared with collaborators.
+- After `clarify-requirements` has completed
+- Memory contains `requirements-[project-name]`
+- Need a document to share with collaborators or hand off to a coding engine
 
 ## Prerequisites
 
@@ -15,27 +21,27 @@ After `clarify-requirements` has run and answers are saved to Hermes memory. Cre
 
 ## Procedure
 
-1. Retrieve `requirements-[project-name]` from Hermes memory.
+1. Retrieve `requirements-[project-name]` from Hermes memory
 2. Generate a product brief with these sections:
-   - **Problem Statement** — one paragraph: what problem, who has it, how often
-   - **Target Users** — specific description (not "developers" — be precise)
-   - **Core Features (V1)** — numbered list, priority order, max 5, each with one-sentence description
-   - **Out of Scope (V1)** — numbered list of explicit exclusions
-   - **Tech Stack** — each layer (frontend, backend, database, auth, deployment, monitoring) with chosen tool and one-sentence rationale
-   - **Success Criteria** — measurable outcomes 30 days after launch
+   - **Problem Statement** — one paragraph: problem, who, how often
+   - **Target Users** — specific description
+   - **Core Features (V1)** — max 5, numbered, priority order, one-sentence each
+   - **Out of Scope (V1)** — explicit exclusions
+   - **Tech Stack** — each layer with chosen tool and one-sentence rationale
+   - **Success Criteria** — measurable outcomes at 30 days
    - **Open Questions** — anything marked [OPEN QUESTION] in requirements
-3. Save to Hermes memory under key: `product-brief-[project-name]`
+3. Save to Hermes memory: key `product-brief-[project-name]`
 4. Write to `PRODUCT_BRIEF.md` in current directory
-5. Offer to continue to design-handoff or choose-engine
+5. Offer to continue to `design-handoff` or `choose-engine`
 
 ## Pitfalls
 
-- Do not invent requirements not in memory. Mark anything unclear as an open question.
-- Do not list more than 5 core features. Pick the 5 highest-priority.
-- Tech stack section must be specific. "Supabase PostgreSQL — chosen for built-in RLS and auth" not "we'll use a database."
+- Do not invent requirements not in memory. Mark anything unclear as open question.
+- Do not list more than 5 core features. Prioritize ruthlessly.
+- Tech stack entries must be specific: "Supabase PostgreSQL — built-in RLS and auth" not "a database."
 
 ## Verification
 
 - `PRODUCT_BRIEF.md` exists in current directory
 - Brief retrievable from Hermes memory as `product-brief-[project-name]`
-- All open questions from requirements appear in the Open Questions section
+- All [OPEN QUESTION] items from requirements appear in Open Questions section

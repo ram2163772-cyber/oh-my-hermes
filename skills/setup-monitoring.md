@@ -1,19 +1,25 @@
 ---
 name: setup-monitoring
-description: Configure Sentry error tracking and document Uptime Kuma setup for a deployed app
+description: Use when a newly deployed app has no error tracking or uptime monitoring configured
 version: 1.0.0
 tags: [monitoring, sentry, uptime, ops]
 ---
 
+## Overview
+
+Installs Sentry for error tracking and documents Uptime Kuma setup. Run once per project after first deploy.
+
 ## When to Use
 
-After deploying to Vercel for the first time. Run once per project.
+- First deployment to Vercel is complete
+- App has no Sentry DSN configured
+- `monitoring-config` not in Hermes memory
 
 ## Prerequisites
 
 - App deployed to Vercel with working `/api/health` endpoint
 - Sentry account at sentry.io
-- SLACK_WEBHOOK_URL available for notifications
+- `SLACK_WEBHOOK_URL` available
 
 ## Procedure
 
@@ -23,7 +29,7 @@ npm install @sentry/nextjs
 npx @sentry/wizard@latest -i nextjs
 ```
 
-The wizard creates `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, and updates `next.config.js`. Review changes before committing.
+The wizard creates `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, and patches `next.config.js`. Review diff before committing.
 
 Add to `.env.local`:
 ```
@@ -37,33 +43,31 @@ vercel env add SENTRY_DSN production
 vercel env add SENTRY_AUTH_TOKEN production
 ```
 
-**Uptime Kuma (uptime monitoring):**
-
-Uptime Kuma is a self-hosted uptime monitor. If you have a VPS ($5/month):
+**Uptime Kuma (if VPS available):**
 ```bash
-docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:1
+docker run -d --restart=always -p 3001:3001 \
+  -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:1
 ```
 
-Then in the Uptime Kuma UI:
-1. Add new monitor → HTTP(s)
+In Uptime Kuma UI:
+1. Add monitor → HTTP(s)
 2. URL: `https://[your-app].vercel.app/api/health`
 3. Heartbeat interval: 60 seconds
-4. Set up Slack notification integration with your SLACK_WEBHOOK_URL
+4. Add Slack notification with `SLACK_WEBHOOK_URL`
 
-Alternative (no self-hosting): Better Uptime (betteruptime.com) offers a free tier with similar functionality.
+No VPS: use Better Uptime (betteruptime.com) free tier.
 
-**Save config to Hermes memory:**
-- key: `monitoring-config`, value: `{ sentry: true, uptimeKuma: [url-or-null], slackAlert: true }`
+Save to Hermes memory: key `monitoring-config`, value `{ sentry: true, uptimeKuma: [url-or-null], slackAlert: true }`.
 
 ## Pitfalls
 
-- The Sentry wizard modifies `next.config.js`. Review the diff before committing — it adds `withSentryConfig` wrapper.
-- Test Sentry is working: trigger a deliberate error in dev, confirm it appears in Sentry dashboard before deploying.
-- Uptime Kuma polls every 60 seconds — first alert fires after the first failed check, not immediately.
+- The Sentry wizard modifies `next.config.js` with `withSentryConfig` wrapper. Review before committing.
+- Test Sentry in dev before deploying — trigger a deliberate error, confirm it appears in the dashboard.
+- Uptime Kuma alerts fire after the first failed poll (60s interval), not immediately.
 
 ## Verification
 
-- Sentry DSN is in Vercel env
-- Trigger test error in dev → confirm it appears in Sentry
-- Uptime Kuma shows monitor as "Up" for your health endpoint
-- Monitoring config saved to Hermes memory
+- `SENTRY_DSN` in Vercel env vars
+- Test error appears in Sentry dashboard
+- Uptime Kuma shows monitor as "Up"
+- `monitoring-config` saved to Hermes memory

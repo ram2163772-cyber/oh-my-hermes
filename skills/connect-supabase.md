@@ -1,13 +1,19 @@
 ---
 name: connect-supabase
-description: Wire a Supabase project to the app, set up migrations, and add environment variables to Vercel
+description: Use when a Supabase project needs to be linked to the app for the first time, or when new migrations need to be pushed
 version: 1.0.0
-tags: [supabase, database, setup, ops]
+tags: [supabase, database, setup, migrations]
 ---
+
+## Overview
+
+Links Supabase to the project, sets environment variables locally and in Vercel, pushes migrations.
 
 ## When to Use
 
-When connecting a Supabase project for the first time, or when pushing new migrations to the live database.
+- First-time Supabase connection for this project
+- New migrations to push to the live database
+- Supabase env vars missing from Vercel
 
 ## Prerequisites
 
@@ -20,8 +26,8 @@ When connecting a Supabase project for the first time, or when pushing new migra
 
 **Initial setup:**
 ```bash
-supabase init                               # initialize if not already done
-supabase link --project-ref [project-ref]   # link to your project
+supabase init                               # if not already initialized
+supabase link --project-ref [project-ref]
 ```
 
 Add to `.env.local` (values from Supabase dashboard → Settings → API):
@@ -40,7 +46,7 @@ vercel env add SUPABASE_SERVICE_KEY production
 vercel env add DATABASE_URL production
 ```
 
-Push existing migrations:
+Push migrations:
 ```bash
 supabase db push
 ```
@@ -56,12 +62,12 @@ supabase db push
 
 ## Pitfalls
 
-- SUPABASE_SERVICE_KEY has full DB access — never expose to client or prefix with NEXT_PUBLIC_.
-- `supabase db push` is irreversible for destructive changes. Review migration files before pushing.
-- Always commit migration files to git — they are the source of truth for the schema.
+- `SUPABASE_SERVICE_KEY` has full DB access — never prefix with `NEXT_PUBLIC_` or expose to the client.
+- `supabase db push` is irreversible for destructive changes. Review migration files before running.
+- Always commit migration files to git — they are the schema source of truth.
 
 ## Verification
 
 - `supabase status` shows linked and correct project
-- All 4 vars in `.env.local` and Vercel dashboard
+- All 4 env vars in `.env.local` and Vercel dashboard
 - `supabase db diff` shows no pending changes
