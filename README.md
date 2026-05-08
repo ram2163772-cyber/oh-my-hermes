@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-4ade80?style=flat-square)](https://github.com/salomondiei08/oh-my-hermes/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Hermes](https://img.shields.io/badge/Hermes-v0.9%2B-orange?style=flat-square)](https://hermes-agent.nousresearch.com)
-[![Skills](https://img.shields.io/badge/skills-15-brightgreen?style=flat-square)](#skills-included)
+[![Skills](https://img.shields.io/badge/skills-18-brightgreen?style=flat-square)](#skills-included)
 [![Stack](https://img.shields.io/badge/stack-Markdown%20%2B%20Bash-zinc?style=flat-square)](#)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black?style=flat-square)](https://vercel.com)
 [![DB](https://img.shields.io/badge/db-Supabase-3ecf8e?style=flat-square)](https://supabase.com)
@@ -47,7 +47,7 @@ Hermes Agent has persistent memory, autonomous skill generation, 19+ messaging p
 
 Oh My Hermes fills that gap with:
 
-- **15 skills** — tested workflow skills covering the full app lifecycle and GitHub ops
+- **18 skills** — covering the full app lifecycle, GitHub ops, and autonomous CTO loop
 - **Hermes-native framing** — designed for Hermes as the primary operator, not as a routing layer requiring human intervention
 - **VPS-ready** — works with Hermes running on a $5/month server or your local machine
 - **Conventions** — AGENTS.md templates and project structure standards
@@ -116,7 +116,7 @@ RUNNING APP — Hermes watches it
 curl -fsSL https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/install.sh | bash
 ```
 
-Installs 15 skills and 4 workflows to `~/.hermes/skills/` and `~/.hermes/workflows/`.
+Installs 18 skills and 5 workflows to `~/.hermes/skills/` and `~/.hermes/workflows/`.
 
 ### Bootstrap a new project
 
@@ -183,6 +183,9 @@ bash /tmp/oh-my-hermes/scripts/bootstrap.sh
 | `post-deploy-followup` | Health check + deployment log + notification + summary |
 | `manage-github-issues` | Triage, create, label, assign, and close GitHub issues |
 | `create-github-pr` | Creates PR from feature branch with memory-drawn description |
+| `auto-issue-triage` | Cron-triggered: scores open issues, picks top priority, routes to implementation |
+| `review-github-pr` | Self-reviews PR diff, runs build and health check, writes plain-English founder summary |
+| `await-merge-approval` | Sends PR summary to founder via chat, blocks until YES/NO reply, merges or iterates |
 
 ---
 
@@ -281,6 +284,55 @@ See [docs/improvements-to-hermes.md](docs/improvements-to-hermes.md) — concret
 
 ---
 
+## Autonomous CTO loop
+
+The goal of Oh My Hermes is a real CTO for non-technical founders — one that works around the clock and only interrupts you when a decision is needed.
+
+Once configured, the loop runs every hour without you touching anything:
+
+```
+Hermes monitors GitHub → picks top issue → implements → creates PR →
+self-reviews → messages you → YOU: reply YES or NO → ships or iterates
+```
+
+**What you actually do:**
+
+You get a message on Telegram (or Slack, Discord, WhatsApp — wherever you are):
+
+```
+New update ready
+
+PR #12: Fix login redirect for new users
+──────────────────────────────────────────
+What changed:
+Users who signed up but hadn't verified their email were being
+sent to a broken page. They now see a "Check your inbox" screen.
+
+Files touched: 2 files
+  src/middleware.ts — fixed the redirect condition
+  src/app/verify/page.tsx — added the confirmation screen
+
+Quality checks:
+✓ Build: passing
+✓ Preview: healthy (180ms)
+✓ No secrets detected
+
+Preview link: https://myapp-fix-login-salomondiei08.vercel.app
+
+Reply YES to ship it. Reply NO to skip (tell me why).
+```
+
+You reply YES. It merges, deploys, health-checks, and notifies you when it's live. You never opened a terminal.
+
+**To set it up:**
+```
+tell Hermes: set up the CTO loop for github.com/yourusername/yourrepo, send approvals to me on Telegram
+```
+
+See the `cto-loop` workflow and `auto-issue-triage`, `review-github-pr`, and `await-merge-approval` skills for full details.
+
+---
+
 ## Requirements
 
 | Requirement | Version |
@@ -309,7 +361,7 @@ Claude Code and Codex are optional. Hermes handles the full workflow without the
 ## Roadmap
 
 **V1 — current**
-15 skills, 4 workflows, AGENTS.md conventions, Vercel + Supabase + GitHub ops integration, scripts, full docs, example app.
+18 skills, 5 workflows, AGENTS.md conventions, Vercel + Supabase + GitHub ops + autonomous CTO loop, scripts, full docs, example app.
 
 **V2 — planned**
 Cron-based health monitoring (Hermes watches production on a schedule), incident creation skill, post-deploy automated tests, staging → production promotion workflow.

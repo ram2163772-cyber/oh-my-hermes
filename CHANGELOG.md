@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.2.0 — 2026-05-09
+
+### Added — Autonomous CTO loop
+
+**Skills**
+- `auto-issue-triage` — cron-triggered hourly triage: scores issues by impact, picks top priority, routes to implementation
+- `review-github-pr` — self-reviews PR diff, runs build + health check on preview URL, writes plain-English founder summary
+- `await-merge-approval` — sends PR summary to founder via chat platform, blocks until YES/NO, merges or feeds back into the loop
+
+**Workflows**
+- `cto-loop` — full autonomous CTO workflow: cron → triage → implement → PR → review → approval → ship
+
+**README**
+- Added "Autonomous CTO loop" section with real example of the founder Telegram experience
+
+---
+
 ## 1.1.0 — 2026-05-09
 
 ### Added
