@@ -117,6 +117,31 @@ bash ~/.hermes/verify.sh    # or the path where you cloned the repo
 
 All items should show [OK].
 
+## Step 5b — Configure the CTO loop agents
+
+This creates real Hermes profiles for each agent, initializes the kanban board, and sets up cron jobs. Run it after `install.sh`:
+
+```bash
+# Set these first (see Step 7 for details):
+export GITHUB_TOKEN=your-fine-grained-token
+export GITHUB_USERNAME=your-github-username
+export GITHUB_REPO=owner/repo
+export PRODUCTION_URL=https://yourapp.vercel.app   # optional but recommended
+
+bash /path/to/oh-my-hermes/scripts/setup-cto.sh
+```
+
+The script:
+- Creates Hermes profiles: `cto`, `pm`, `dev`, `qa`, `ops`
+- Injects each agent's role definition into its profile
+- Initializes the kanban board
+- Authenticates `gh` CLI using your token (no browser needed)
+- Warns if a gateway is already running (do not start duplicate gateways with the same bot token)
+- Saves your repo and username to Hermes memory
+- Sets up three cron jobs: hourly issue triage, 15-min health check, 9am daily report
+
+Safe to re-run — it is idempotent.
+
 ---
 
 ## Step 6 — Bootstrap your project

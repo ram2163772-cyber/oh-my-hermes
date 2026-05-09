@@ -118,7 +118,7 @@ RUNNING APP — Hermes watches it
 curl -fsSL https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/install.sh | bash
 ```
 
-Installs 18 skills and 5 workflows to `~/.hermes/skills/` and `~/.hermes/workflows/`.
+Installs 20 skills and 5 workflows to `~/.hermes/skills/` and `~/.hermes/workflows/`.
 
 ### Bootstrap a new project
 
@@ -134,6 +134,20 @@ Creates `AGENTS.md`, `.env.example`, and `src/app/api/health/route.ts`.
 ```bash
 bash /path/to/oh-my-hermes/scripts/verify.sh
 ```
+
+### Configure the CTO loop
+
+After installing, run the CTO setup script once to create agent profiles, initialize the kanban board, and schedule cron jobs:
+
+```bash
+export GITHUB_TOKEN=your-fine-grained-token
+export GITHUB_USERNAME=your-github-username
+export GITHUB_REPO=owner/repo
+
+bash /path/to/oh-my-hermes/scripts/setup-cto.sh
+```
+
+Safe to re-run. See [docs/setup-guide.md](docs/setup-guide.md) for the complete walkthrough.
 
 ### For Hermes (hand it directly)
 
@@ -379,7 +393,7 @@ Claude Code and Codex are optional. Hermes handles the full workflow without the
 ## Roadmap
 
 **V1 — current**
-18 skills, 5 workflows, AGENTS.md conventions, Vercel + Supabase + GitHub ops + autonomous CTO loop, scripts, full docs, example app.
+20 skills, 5 agent profiles, 5 workflows, AGENTS.md conventions, one-command CTO setup, Vercel + Supabase + GitHub ops, scripts, full docs, example app.
 
 **V2 — planned**
 Cron-based health monitoring (Hermes watches production on a schedule), incident creation skill, post-deploy automated tests, staging → production promotion workflow.

@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.4.0 — 2026-05-09
+
+### Added — CTO setup script and README corrections
+
+**scripts/setup-cto.sh** (new)
+- Creates real Hermes profiles (`hermes profile create cto/pm/dev/qa/ops`)
+- Injects agent role definitions into `~/.hermes/profiles/$agent/agent-role.md`
+- Initializes the Hermes kanban board (`hermes kanban init`)
+- Authenticates `gh` CLI headlessly: `echo "$GITHUB_TOKEN" | gh auth login --with-token`
+- Warns prominently if a gateway is already running (duplicate gateway = message conflicts)
+- Saves `github-repo` and `github-username` to Hermes memory via `hermes chat -q`
+- Sets up 3 cron jobs: hourly triage, 15-min health check, 9am status report
+- Idempotent — safe to re-run; prints Pass/Warn/Fail summary
+
+**docs/setup-guide.md**
+- Added Step 5b: explains `setup-cto.sh` and its env var requirements
+
+**README.md**
+- Fixed stale "18 skills" count to "20 skills" in two locations
+- Added "Configure the CTO loop" install step referencing `setup-cto.sh`
+
+**scripts/verify.sh**
+- Now checks that `setup-cto.sh` exists alongside `bootstrap.sh` and `verify.sh`
+
+---
+
 ## 1.3.0 — 2026-05-09
 
 ### Added — Multi-agent architecture with Hermes kanban

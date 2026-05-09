@@ -74,12 +74,20 @@ check "github-ops"         "$WORKFLOWS_DIR/github-ops.md"
 check "cto-loop"           "$WORKFLOWS_DIR/cto-loop.md"
 
 echo ""
+echo "Scripts:"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+check "bootstrap.sh"    "$SCRIPT_DIR/bootstrap.sh"
+check "verify.sh"       "$SCRIPT_DIR/verify.sh"
+check "setup-cto.sh"    "$SCRIPT_DIR/setup-cto.sh"
+
+echo ""
 echo "=============================="
 echo "Passed: $PASS   Failed: $FAIL"
 if [ "$FAIL" -eq 0 ]; then
   echo ""
   echo "Oh My Hermes install looks good."
   echo "Next: cd into your project and run scripts/bootstrap.sh"
+  echo "Then run scripts/setup-cto.sh to configure the CTO loop."
 else
   echo ""
   echo "Install incomplete — run install.sh to fix missing items."
