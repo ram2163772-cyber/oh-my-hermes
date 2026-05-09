@@ -1,6 +1,6 @@
 ---
 name: post-deploy-followup
-description: Use after every deployment to verify health, log the deployment, and send notification
+description: Use when a deployment has just completed and health verification, logging, and notification need to run
 version: 1.0.0
 tags: [deployment, ops, health, notification]
 ---
