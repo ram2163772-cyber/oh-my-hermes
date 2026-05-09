@@ -42,6 +42,71 @@ YOU  ──  Telegram / Slack / Discord / terminal
 
 ---
 
+## How it all fits together
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        YOU (founder)                            │
+│         Telegram · Slack · Discord · WhatsApp · terminal        │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │  plain-language messages
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   HERMES  (VPS / local, 24/7)                   │
+│                                                                 │
+│  ┌──────────┐   routes to   ┌─────────────────────────────────┐ │
+│  │ Gateway  │ ────────────▶ │        CTO Agent                │ │
+│  │(Telegram │               │  monitors kanban, orchestrates  │ │
+│  │ /Slack…) │               └───────────┬─────────────────────┘ │
+│  └──────────┘                           │  spawns sub-agents    │
+│                           ┌─────────────┼──────────────────┐    │
+│                           ▼             ▼                  ▼    │
+│                     ┌─────────┐  ┌─────────┐  ┌─────────────┐  │
+│                     │   PM    │  │   Dev   │  │  QA  · Ops  │  │
+│                     │ triage  │  │ build   │  │ review·ship │  │
+│                     │ tickets │  │ PRs     │  │ monitor     │  │
+│                     └────┬────┘  └────┬────┘  └──────┬──────┘  │
+│                          │            │               │         │
+│                    ┌─────▼────────────▼───────────────▼──────┐  │
+│                    │           Hermes Kanban                  │  │
+│                    │  Backlog → In Progress → Review → Done   │  │
+│                    └─────────────────────────────────────────┘  │
+│                                                                 │
+│  Persistent memory · 20 skills · 5 workflows · cron jobs        │
+└──────┬─────────────────────────────────────────────────────────┘
+       │
+       │  invokes when needed
+       ├──▶  Claude Code  (deep multi-file coding)
+       ├──▶  Codex        (quick single-file fixes)
+       │
+       │  deploys & monitors
+       ├──▶  Vercel       (hosting + preview URLs)
+       ├──▶  Supabase     (database + auth + migrations)
+       ├──▶  GitHub       (issues, PRs, merge)
+       └──▶  Sentry / Uptime Kuma  (error tracking + uptime)
+```
+
+**The autonomous loop** — once configured, this runs every hour without you touching anything:
+
+```
+GitHub issue opens
+       ↓
+  PM scores & triages  →  kanban: Backlog
+       ↓
+  Dev picks top issue  →  kanban: In Progress
+       ↓
+  Dev implements, creates PR  →  kanban: Review
+       ↓
+  QA reviews diff, runs health check, writes plain-English summary
+       ↓
+  YOU get a Telegram message: "PR #12 ready — reply YES or NO"
+       ↓
+  YES → merges, deploys, health checks, confirms live URL
+  NO  → Dev iterates based on your feedback
+```
+
+---
+
 ## What problem does this solve?
 
 Hermes Agent has persistent memory, autonomous skill generation, 19+ messaging platforms, cron scheduling, and flexible deployment backends. But out of the box, it gives you no defaults for Vercel, no conventions for Supabase, no curated skills for the idea→deploy lifecycle, and no AGENTS.md template for real projects.
