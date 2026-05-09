@@ -21,8 +21,9 @@ Automated triage pass. Scores every open issue, picks the top priority, creates 
 
 ## Prerequisites
 
-- GitHub CLI authenticated: `gh auth login`
+- GitHub CLI authenticated: `echo "$GITHUB_TOKEN" | gh auth login --with-token`
 - Hermes memory has `github-repo` key set (owner/repo format)
+- `GITHUB_USERNAME` set in environment (your GitHub username — Hermes self-assigns issues)
 - Cron configured (see Setup below)
 
 ## Setup (one-time)
@@ -74,7 +75,7 @@ hermes cron list
 
 6. **Assign and label on GitHub:**
    ```bash
-   gh issue edit [number] --add-label "in-progress"
+   gh issue edit [number] --add-label "in-progress" --add-assignee "$GITHUB_USERNAME"
    ```
 
 7. **Save to memory:** key `current-task` → `{ issueNumber, taskId, title, assignedAt }`

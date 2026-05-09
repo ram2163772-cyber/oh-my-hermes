@@ -19,7 +19,7 @@ Hermes manages GitHub issues via the `gh` CLI — list, triage, create, label, c
 ## Prerequisites
 
 - GitHub CLI: `npm install -g @github/cli` or `brew install gh`
-- Authenticated: `gh auth login`
+- Authenticated: `echo "$GITHUB_TOKEN" | gh auth login --with-token`
 - Project repo identified (from Hermes memory key `github-repo` or current directory)
 
 ## Procedure

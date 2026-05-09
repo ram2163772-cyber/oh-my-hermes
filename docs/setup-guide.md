@@ -77,7 +77,21 @@ hermes gateway setup     # choose Slack, follow OAuth flow
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list
 sudo apt update && sudo apt install gh -y
-gh auth login        # follow the OAuth flow
+
+# GitHub authentication — VPS has no browser, use a token instead of gh auth login
+# 1. Go to github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+# 2. Create a token with these permissions on your repo:
+#    - Contents: Read & Write      (push code)
+#    - Issues: Read & Write        (triage, comment, close)
+#    - Pull requests: Read & Write (create, merge PRs)
+#    - Metadata: Read              (required base permission)
+# 3. Copy the token, then on your VPS:
+echo "YOUR_GITHUB_TOKEN" | gh auth login --with-token
+gh auth status   # confirm: Logged in to github.com as [your-username]
+
+# Also set it as an env var so skills can use it directly:
+echo 'export GITHUB_TOKEN="YOUR_GITHUB_TOKEN"' >> ~/.bashrc
+source ~/.bashrc
 
 # Vercel CLI
 npm install -g vercel
@@ -127,9 +141,17 @@ This creates:
 Required minimum:
 ```bash
 # In your .env.local
-VERCEL_TOKEN=             # Vercel dashboard → Account Settings → Tokens
-SLACK_WEBHOOK_URL=        # or leave empty if using Telegram for notifications
-GITHUB_TOKEN=             # gh auth token (gh auth token)
+
+# GitHub — required for all CTO loop skills (issues, PRs, kanban)
+# Create at: github.com → Settings → Developer settings → Personal access tokens → Fine-grained
+# Permissions needed: Contents (R/W), Issues (R/W), Pull requests (R/W), Metadata (R)
+GITHUB_TOKEN=your-fine-grained-token
+GITHUB_USERNAME=your-github-username     # used when Hermes assigns issues to itself
+GITHUB_REPO=owner/repo                   # the repo the CTO loop manages
+
+# Vercel
+VERCEL_TOKEN=             # vercel.com → Account Settings → Tokens
+SLACK_WEBHOOK_URL=        # leave empty if using Telegram only
 ```
 
 Add to Vercel for production:

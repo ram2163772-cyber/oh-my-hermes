@@ -17,7 +17,7 @@ Creates a GitHub PR with a description drawn from Hermes memory — implementati
 
 ## Prerequisites
 
-- GitHub CLI: `gh auth login`
+- GitHub CLI: `echo "$GITHUB_TOKEN" | gh auth login --with-token`
 - Changes committed and pushed to a feature branch
 - At least one Hermes memory entry about the implementation (spec, brief, or summary)
 
