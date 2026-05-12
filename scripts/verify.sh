@@ -58,6 +58,7 @@ check "kanban-task"                "$SKILLS_DIR/kanban-task.md"
 check "cto-status-report"          "$SKILLS_DIR/cto-status-report.md"
 check "backup-hermes-data"         "$SKILLS_DIR/backup-hermes-data.md"
 check "security-review"            "$SKILLS_DIR/security-review.md"
+check "onboarding"                 "$SKILLS_DIR/onboarding.md"
 
 echo ""
 echo "Agents:"

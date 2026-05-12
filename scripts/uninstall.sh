@@ -21,7 +21,7 @@ SKILLS=(
   setup-monitoring health-check send-notification post-deploy-followup
   manage-github-issues create-github-pr auto-issue-triage review-github-pr
   await-merge-approval kanban-task cto-status-report backup-hermes-data
-  security-review
+  security-review onboarding
 )
 
 WORKFLOWS=(idea-to-deploy design-to-code deploy-and-monitor github-ops cto-loop)
