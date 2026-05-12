@@ -173,11 +173,30 @@ RUNNING APP — Hermes watches it
 
 ---
 
+## What you unlock at each step
+
+You do not need everything on day one. Here is exactly what you get at each stage — set up only what you need.
+
+| Step | What to do | What you unlock |
+|---|---|---|
+| 1 | Install Hermes Agent | The runtime — nothing else works without this |
+| 2 | `install.sh` | 21 skills + 5 workflows loaded into Hermes |
+| 3 | `scripts/bootstrap.sh` in your project | `AGENTS.md`, `.env.example`, `/api/health` endpoint |
+| 4 | Fill in `AGENTS.md` and `.env.local` | Hermes knows your stack, credentials work |
+| 5 | `export GITHUB_TOKEN` + `setup-cto.sh` | Agents active, kanban live, crons scheduled — full autonomous loop |
+| 6 | `hermes gateway setup` + Telegram | You receive approval messages on your phone |
+| 7 | `/goal` command in Hermes | Agent stays focused across long sessions — prevents drift |
+| 8 | Deploy to Vercel + set `PRODUCTION_URL` | Health monitoring every 15 min, Ops Agent watches production |
+
+**Minimum to try the loop:** Steps 1–5. Steps 6–8 make it production-ready.
+
+---
+
 ## Installation
 
 ### For humans
 
-**Requires:** [Hermes Agent](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart) v0.9+, running locally or on a VPS.
+**Requires:** [Hermes Agent](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart) v0.13+, running locally or on a VPS.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/install.sh | bash
@@ -241,6 +260,14 @@ bash /tmp/oh-my-hermes/install.sh
 bash /tmp/oh-my-hermes/scripts/verify.sh
 cd /path/to/target/project
 bash /tmp/oh-my-hermes/scripts/bootstrap.sh
+```
+
+### Uninstall
+
+Removes all Oh My Hermes skills, workflows, and agent profiles from `~/.hermes/`. Does not touch Hermes itself, your memory, or your gateway.
+
+```bash
+bash /path/to/oh-my-hermes/scripts/uninstall.sh
 ```
 
 ---

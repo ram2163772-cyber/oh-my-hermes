@@ -23,22 +23,29 @@ Creates a GitHub PR with a description drawn from Hermes memory — implementati
 
 ## Procedure
 
-1. Confirm current branch and remote:
+1. **Secret scan — STOP if anything found:**
+   ```bash
+   git diff main...HEAD | grep -iE "(api_key|secret|password|token|private_key|SERVICE_KEY|DATABASE_URL)\s*=" | grep -v "your-" | grep -v "example"
+   git ls-files | grep -iE "\.env"
+   ```
+   If any real credential appears, do not create the PR. Tell the user which file and line. Fix it first.
+
+2. Confirm current branch and remote:
    ```bash
    git branch --show-current
    git remote -v
    ```
 
-2. Push branch if not yet pushed:
+3. Push branch if not yet pushed:
    ```bash
    git push -u origin [branch-name]
    ```
 
-3. Retrieve from Hermes memory:
+4. Retrieve from Hermes memory:
    - `implementation-spec-[feature-name]` or `implementation-[feature-name]`
    - Any linked issue numbers
 
-4. Compose PR body:
+5. Compose PR body:
    ```
    ## What
    [one-paragraph description of what changed]
@@ -56,7 +63,7 @@ Creates a GitHub PR with a description drawn from Hermes memory — implementati
    Closes #[issue-number]
    ```
 
-5. Create the PR:
+6. Create the PR:
    ```bash
    gh pr create \
      --title "[descriptive title]" \
@@ -66,9 +73,9 @@ Creates a GitHub PR with a description drawn from Hermes memory — implementati
    ```
    Use `--draft` by default. Remove when ready for review.
 
-6. Save PR URL to Hermes memory: key `pr-[feature-name]`, value `{ url, number, branch }`.
+7. Save PR URL to Hermes memory: key `pr-[feature-name]`, value `{ url, number, branch }`.
 
-7. Offer to run `health-check` on the Vercel preview URL.
+8. Offer to run `health-check` on the Vercel preview URL.
 
 ## Pitfalls
 

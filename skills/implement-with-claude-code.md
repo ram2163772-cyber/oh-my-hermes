@@ -50,13 +50,35 @@ Composes a handoff prompt from Hermes memory and project context. Claude Code ha
 4. Provide the exact prompt to paste (from step 2)
 5. After session: ask user to confirm expected output exists. Save to Hermes memory: `implementation-[feature-name]` → `completed by Claude Code on [date]`
 
+## Scope constraint
+
+Every changed file must trace directly to the task. Include in the handoff prompt:
+
+```
+Surgical scope:
+- Change only what the task requires. Do not refactor adjacent code.
+- Do not add features beyond what is specified.
+- Match existing code style — do not reformat.
+- Commit after every logical unit of work with a clear message.
+
+Never commit:
+- API keys, tokens, passwords, or credentials of any kind
+- .env files or any file matching *.env*
+- Connection strings with passwords embedded
+- Private keys or certificates
+Run `git diff --staged` and scan for secrets before every commit.
+If you see a key or credential, stop and tell the user immediately.
+```
+
 ## Pitfalls
 
 - Always include "Read AGENTS.md before starting" — Claude Code follows this.
 - Include full memory context in the prompt. Claude Code cannot access Hermes memory.
-- Be specific: "Add Stripe billing — monthly/annual plans, store subscription status in Supabase users table, add /api/billing/subscribe and /api/billing/cancel endpoints" not "add billing."
+- Be specific: "Add Stripe billing — monthly/annual plans, store subscription status in Supabase users table" not "add billing."
 
 ## Verification
 
 - User confirms expected output exists
+- All changed files trace directly to the task — no unrelated edits
+- No secrets in committed files
 - Outcome saved to Hermes memory

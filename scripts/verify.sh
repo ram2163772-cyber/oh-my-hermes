@@ -102,6 +102,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 check "bootstrap.sh"    "$SCRIPT_DIR/bootstrap.sh"
 check "verify.sh"       "$SCRIPT_DIR/verify.sh"
 check "setup-cto.sh"    "$SCRIPT_DIR/setup-cto.sh"
+check "uninstall.sh"    "$SCRIPT_DIR/uninstall.sh"
 
 echo ""
 echo "=============================="

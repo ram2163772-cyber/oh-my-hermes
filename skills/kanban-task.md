@@ -32,8 +32,10 @@ hermes kanban create "Fix: [what] — Issue #[n] | Priority: [score]"
 ```
 Or via agent toolset (preferred inside a skill):
 ```
-kanban_create title="Fix: [what]" description="Issue #[n] | Why: [one sentence] | Acceptance: [criteria]"
+kanban_create title="Fix: [what]" description="Issue #[n] | Why: [one sentence] | Acceptance: [verifiable check, e.g. 'GET /api/health returns 200 AND existing tests pass']"
 ```
+
+Acceptance criteria must be a concrete, verifiable check — not "it works." If you cannot write a specific check, ask for clarification before creating the card.
 
 Save returned task ID to Hermes memory: key `task-id-issue-[n]`.
 

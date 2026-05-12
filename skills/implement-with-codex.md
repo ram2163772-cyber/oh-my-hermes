@@ -39,6 +39,17 @@ Composes a self-contained Codex CLI command. Codex context is per-invocation —
 
 4. After completion: save outcome to Hermes memory
 
+## Scope constraint
+
+Add to every Codex prompt:
+
+```
+Change only the file and function named above.
+Do not touch other files. Do not refactor adjacent code.
+After changes: commit with a clear message.
+Do NOT commit .env files, API keys, tokens, or any credentials.
+```
+
 ## Pitfalls
 
 - Every invocation starts fresh. Put ALL relevant context in the prompt string — no persistent state.
@@ -47,6 +58,8 @@ Composes a self-contained Codex CLI command. Codex context is per-invocation —
 
 ## Verification
 
-- Specific file changed as expected
+- Only the named file changed
 - Build/typecheck passes: `npm run typecheck`
+- Changes committed with a clear message
+- No secrets in committed files
 - Outcome saved to Hermes memory

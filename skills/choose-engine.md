@@ -21,7 +21,16 @@ tags: [routing, orchestration, engine]
 
 ## Procedure
 
-Apply in order — stop at the first match:
+**Before routing — state assumptions (30 seconds, always):**
+
+Look at the task. Say out loud:
+- "I am assuming [X]" — if wrong, stop and ask.
+- "This could mean [A] or [B]" — if ambiguous, ask. Do not pick silently.
+- "A simpler approach would be [Y]" — if so, propose it instead.
+
+If the task is vague, ask one clarifying question. Do not start implementation on a guess.
+
+**Route in order — stop at the first match:**
 
 1. **UI/UX exploration, no code yet?**
    → Claude Design (human step at claude.ai/design). Tell user, then offer to run `design-handoff` with the output.
