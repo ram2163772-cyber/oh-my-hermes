@@ -8,8 +8,11 @@
 [![Stack](https://img.shields.io/badge/stack-Markdown%20%2B%20Bash-zinc?style=flat-square)](#)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black?style=flat-square)](https://vercel.com)
 [![DB](https://img.shields.io/badge/db-Supabase-3ecf8e?style=flat-square)](https://supabase.com)
+[![Star History](https://img.shields.io/github/stars/salomondiei08/oh-my-hermes?style=flat-square&label=stars)](https://github.com/salomondiei08/oh-my-hermes/stargazers)
 
 **An opinionated workflow layer for building, shipping, and operating apps — delivered directly to Hermes.**
+
+> **AI agent?** See [INSTALL_FOR_AGENTS.md](INSTALL_FOR_AGENTS.md) for the one-command install protocol.
 
 Like Oh My Zsh is to Zsh. You install it once, and Hermes becomes genuinely useful for real software projects. Not a chatbot wrapper. Not a prompt pack. A set of curated skills that Hermes loads and runs autonomously — on your VPS, on your laptop, wherever Hermes lives.
 
@@ -495,6 +498,34 @@ Cron-based health monitoring (Hermes watches production on a schedule), incident
 
 **V3 — planned**
 Multi-service orchestration, rollback skill, more example apps.
+
+---
+
+## Star history
+
+[![Star History Chart](https://api.star-history.com/svg?repos=salomondiei08/oh-my-hermes&type=Date)](https://star-history.com/#salomondiei08/oh-my-hermes&Date)
+
+---
+
+## Optional: GBrain as memory backbone
+
+[GBrain](https://github.com/garrytan/gbrain) is an open-source knowledge graph and memory system built by Garry Tan. It gives Hermes a durable, self-updating, queryable brain — richer than the default bounded `MEMORY.md`.
+
+Install it once on your VPS alongside Hermes:
+
+```bash
+git clone https://github.com/garrytan/gbrain.git ~/gbrain
+cd ~/gbrain
+curl -fsSL https://bun.sh/install | bash && export PATH="$HOME/.bun/bin:$PATH"
+bun install && bun link
+gbrain init && gbrain doctor --json
+```
+
+> **Do not** use `npm install -g gbrain` or `bun add -g gbrain` — a squatter package exists on npm under that name. Always install from source.
+
+After install, Hermes agents can call `gbrain search`, `gbrain get`, and `gbrain set` to maintain a persistent knowledge graph across sessions — people, companies, decisions, deployment history. Every skill in oh-my-hermes works without gbrain; it is purely additive.
+
+For agent-oriented setup details: see [garrytan/gbrain INSTALL_FOR_AGENTS.md](https://github.com/garrytan/gbrain/blob/master/INSTALL_FOR_AGENTS.md).
 
 ---
 
