@@ -59,6 +59,7 @@ check "cto-status-report"          "$SKILLS_DIR/cto-status-report.md"
 check "backup-hermes-data"         "$SKILLS_DIR/backup-hermes-data.md"
 check "security-review"            "$SKILLS_DIR/security-review.md"
 check "onboarding"                 "$SKILLS_DIR/onboarding.md"
+check "rollback"                   "$SKILLS_DIR/rollback.md"
 
 echo ""
 echo "Agents:"
@@ -80,7 +81,7 @@ check "cto-loop"           "$WORKFLOWS_DIR/cto-loop.md"
 echo ""
 echo "Hermes profiles (run setup-cto.sh if missing):"
 PROFILES_DIR="$HERMES_DIR/profiles"
-for profile in cto pm dev qa ops; do
+for profile in cto pm dev qa ops security; do
   if [ -d "$PROFILES_DIR/$profile" ]; then
     echo "[OK]      profile: $profile"
     PASS=$((PASS + 1))
@@ -102,10 +103,11 @@ fi
 echo ""
 echo "Scripts:"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-check "bootstrap.sh"    "$SCRIPT_DIR/bootstrap.sh"
-check "verify.sh"       "$SCRIPT_DIR/verify.sh"
-check "setup-cto.sh"    "$SCRIPT_DIR/setup-cto.sh"
-check "uninstall.sh"    "$SCRIPT_DIR/uninstall.sh"
+check "bootstrap.sh"       "$SCRIPT_DIR/bootstrap.sh"
+check "verify.sh"          "$SCRIPT_DIR/verify.sh"
+check "setup-cto.sh"       "$SCRIPT_DIR/setup-cto.sh"
+check "uninstall.sh"       "$SCRIPT_DIR/uninstall.sh"
+check "validate-skills.sh" "$SCRIPT_DIR/validate-skills.sh"
 
 echo ""
 echo "=============================="

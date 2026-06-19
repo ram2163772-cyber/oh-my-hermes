@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/salomondiei08/oh-my-hermes?style=flat-square)](https://github.com/salomondiei08/oh-my-hermes/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Hermes](https://img.shields.io/badge/Hermes-v0.13%2B-orange?style=flat-square)](https://hermes-agent.nousresearch.com)
-[![Skills](https://img.shields.io/badge/skills-23-brightgreen?style=flat-square)](#skills)
+[![Skills](https://img.shields.io/badge/skills-24-brightgreen?style=flat-square)](#skills)
 [![Agents](https://img.shields.io/badge/agents-6-blue?style=flat-square)](#agents)
 
 **An opinionated workflow layer for building, shipping, and operating apps — delivered directly to Hermes.**
@@ -63,7 +63,7 @@ You describe what you want in plain language — on Telegram, Slack, Discord, yo
 │                     │                │               │          │
 │              ┌──────▼────────────────▼───────────────▼──────┐   │
 │              │              Hermes Kanban                    │   │
-│              │   Backlog → In Progress → Review → Done       │   │
+│              │   Triage → Ready → Running → Blocked/Done     │   │
 │              └───────────────────────────────────────────────┘   │
 │                                                                 │
 │  Persistent memory · 23 skills · 5 workflows · cron jobs        │
@@ -114,9 +114,9 @@ Once configured, this runs every hour without you touching anything:
 ```
 GitHub issue opens
        ↓
-  PM Agent scores & triages  →  kanban: Backlog
+  PM Agent scores & triages  →  kanban: Ready, assignee=dev
        ↓
-  Dev Agent implements  →  kanban: In Progress
+  Dev Agent implements  →  kanban: Running
        ↓
   Security Agent: secret scan + OWASP check + CVE check
        ↓
@@ -202,6 +202,7 @@ The bot will ask for your GitHub repo, walk you through creating a token step by
 | `kanban-task` | Creates and updates Hermes kanban cards at every stage |
 | `cto-status-report` | Daily morning report: what's in progress, done, blocked |
 | `backup-hermes-data` | Tarballs `~/.hermes/` to S3, Dropbox, or local |
+| `rollback` | Rolls back Vercel production to previous deploy after health check failure — requires founder YES |
 
 ---
 
@@ -230,7 +231,7 @@ The main Hermes session. Owns all kanban columns. Delegates work to sub-agents, 
 
 ### PM — Product Manager
 
-Owns the Backlog column. Converts raw GitHub issues into implementation-ready kanban cards.
+Owns triage and ready work. Converts raw GitHub issues into implementation-ready kanban cards assigned to `dev`.
 
 **What triggers it:** When new issues appear on GitHub or when the CTO spawns it for triage.
 
@@ -238,7 +239,7 @@ Owns the Backlog column. Converts raw GitHub issues into implementation-ready ka
 - Reads open GitHub issues and scores them by impact and urgency (bug labels, comment activity, age, priority labels)
 - Writes kanban tickets with: a verb-based title, the business reason in one sentence, 2-4 testable acceptance criteria, and the linked issue number
 - Flags issues that are too vague — asks you for clarification rather than guessing
-- Pings you after 24h if a card in Awaiting Approval has gone stale
+- Pings you after 24h if a blocked or approval-waiting card has gone stale
 
 **What it does NOT do:** Implement anything, merge PRs, make architecture decisions, or guess at unclear requirements.
 
@@ -246,17 +247,17 @@ Owns the Backlog column. Converts raw GitHub issues into implementation-ready ka
 
 ### Dev — Software Developer
 
-Owns the In Progress column. Picks the top kanban ticket and builds it.
+Owns running implementation work. Claims the top ready kanban ticket and builds it.
 
-**What triggers it:** When the PM Agent moves a card to Backlog and the CTO spawns Dev to start work.
+**What triggers it:** When the PM Agent creates a ready card assigned to `dev` and the dispatcher starts work.
 
 **What it does:**
-- Picks the highest-priority ticket from Backlog
+- Claims the highest-priority ready ticket assigned to `dev`
 - Chooses the right engine for the task: Hermes terminal for ops/config, Codex for single-file bug fixes, Claude Code for multi-file features
 - Implements the change, commits after every logical unit of work
 - Never commits `.env` files, API keys, tokens, or credentials — scans `git diff --staged` before every commit
 - Creates a PR with a description drawn from memory and ticket context
-- Moves the ticket to Review and hands off to the Security Agent
+- Completes the implementation task with PR summary and metadata for Security/QA handoff
 
 **What it does NOT do:** Merge PRs, deploy to production, start a second ticket while one is in progress, or make product decisions.
 
@@ -296,9 +297,9 @@ Sits between Dev and QA on every PR. Runs weekly supply chain checks.
 
 ### QA — Quality Assurance
 
-Owns the Review column. The last check before a PR reaches you.
+Owns product verification before a PR reaches you.
 
-**What triggers it:** When the Security Agent passes a PR and moves it to Review.
+**What triggers it:** When the Security Agent passes a PR and hands off for QA.
 
 **What it does:**
 - Reviews the PR diff for scope creep, leftover TODOs, and missing env vars in `.env.example`

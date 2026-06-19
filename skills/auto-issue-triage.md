@@ -44,13 +44,17 @@ hermes cron list
 
 ## Procedure
 
-1. **Fetch open issues:**
+1. **Cost guard — check last run time:**
+   Retrieve `triage-last-run` from Hermes memory. If it was less than 45 minutes ago, skip this run and log: `{ skippedAt, reason: "too-soon" }`. This prevents runaway token consumption if the cron fires unexpectedly.
+
+2. **Fetch open issues:**
    ```bash
    gh issue list --repo [owner/repo] --state open \
      --json number,title,labels,createdAt,comments --limit 50
    ```
+   If the result contains more than 100 issues, do not score them all. Score the 20 most recently updated and alert the founder: "Over 100 open issues — only top 20 by recency scored. Consider a backlog cleanup."
 
-2. **Score each issue** (0–10, higher = do first):
+3. **Score each issue** (0–10, higher = do first):
    - `bug` label: +4
    - `priority:high` label: +3
    - `priority:low` label: −2
@@ -60,29 +64,29 @@ hermes cron list
    - Already assigned or labeled `in-progress`: skip
    - Labeled `wontfix`, `blocked`, `needs-design`: skip
 
-3. **Pick top-scoring issue.** Tie → pick older one.
+4. **Pick top-scoring issue.** Tie → pick older one.
 
-4. **Check if a task is already in progress:**
+5. **Check if a task is already in progress:**
    - Retrieve `current-task` from Hermes memory
    - Already in progress and not blocked → skip, send quick status update
    - Blocked or stalled > 4 hours → escalate via `send-notification`
 
-5. **Create kanban card** via `kanban-task`:
+6. **Create kanban card** via `kanban-task`:
    ```
-   kanban_create title="[issue title]" description="Issue #[n] | Score: [n] | [why in one line]"
+   kanban_create title="[issue title]" assignee="dev" body="Issue #[n] | Score: [n] | [why in one line] | Acceptance: [2-4 verifiable checks]"
    ```
    Save task ID to memory: `task-id-issue-[n]`.
 
-6. **Assign and label on GitHub:**
+7. **Assign and label on GitHub:**
    ```bash
    gh issue edit [number] --add-label "in-progress" --add-assignee "$GITHUB_USERNAME"
    ```
 
-7. **Save to memory:** key `current-task` → `{ issueNumber, taskId, title, assignedAt }`
+8. **Save to memory:** key `current-task` → `{ issueNumber, taskId, title, assignedAt }`. Also update `triage-last-run` → current ISO timestamp.
 
-8. **Spawn Dev Agent** (or load `choose-engine` directly) with the issue title and body.
+9. **Spawn Dev Agent** (or load `choose-engine` directly) with the issue title and body.
 
-9. **If no actionable issues:**
+10. **If no actionable issues:**
    - `send-notification`: "No open issues. All caught up."
    - Log to memory: `{ checkedAt, status: "idle" }`
 
