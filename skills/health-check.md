@@ -21,7 +21,7 @@ Three-layer check: app endpoint → Supabase connection → Vercel recent logs. 
 
 ## Prerequisites
 
-- Deployed app URL (from Hermes memory key `last-deployment`, or provided directly)
+- Deployed app URL (from Hermes memory key `last-deployment-url`, or provided directly)
 - `SUPABASE_URL` in environment (for Supabase check)
 - Vercel CLI logged in (for log pull)
 
@@ -98,7 +98,7 @@ Vercel logs:    CLEAN / [n] errors detected
 
 - Vercel cold starts cause slow first requests — always retry once before failing.
 - Supabase has its own status page (status.supabase.com) — check it before alerting, the issue may be on their end.
-- `vercel logs` requires the deployment URL, not the alias. Get it from memory key `last-deployment`.
+- `vercel logs` requires the deployment URL, not the alias. Get it from memory key `last-deployment-url`.
 - Do not report Vercel log noise (routine 200s, OPTIONS requests) as errors.
 
 ## Verification

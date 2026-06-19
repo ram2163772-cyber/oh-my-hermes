@@ -190,7 +190,7 @@ Hermes memory is a shared key-value store. All skills and agents read and write 
 | `current-task` | `auto-issue-triage` | `auto-issue-triage`, CTO Agent | `{ issueNumber, taskId, title, assignedAt }` JSON | Currently in-progress issue; prevents parallel work |
 | `task-id-issue-[n]` | `auto-issue-triage` | `kanban-task` | string (kanban card ID) | Maps GitHub issue number to kanban card ID |
 | `triage-last-run` | `auto-issue-triage` | `auto-issue-triage` | ISO 8601 timestamp | Guards against over-frequent triage runs (cost control) |
-| `last-deployment-url` | `deploy-to-vercel` | `rollback`, `post-deploy-followup` | URL string | Most recent Vercel deployment URL |
+|| `last-deployment-url` | `deploy-to-vercel` | `rollback`, `post-deploy-followup`, `health-check` | URL string | Most recent Vercel deployment URL |
 | `notification-log` | `send-notification` | CTO Agent (reporting) | Array of `{ event, timestamp, backend, delivered }` | Audit log of notifications sent |
 | `rollback-log` | `rollback` | CTO Agent (reporting) | Array of `{ rolledBackAt, fromUrl, reason, healthStatus }` | Audit log of production rollbacks |
 | `approval-platform` | `onboarding`, `setup-cto.sh` | `await-merge-approval`, `send-notification` | `telegram` \| `slack` \| `discord` | Where to send founder approval requests |

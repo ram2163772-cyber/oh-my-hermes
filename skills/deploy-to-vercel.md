@@ -52,7 +52,7 @@ Then: Vercel dashboard → Settings → Git → Connect Repository.
 After connecting: main branch pushes → production. Other branches → preview URLs.
 
 **Post-deploy:**
-1. Save URL to Hermes memory: key `last-deployment`, value `{ url, timestamp }`
+1. Save URL to Hermes memory: key `last-deployment-url`, value URL string
 2. Run `post-deploy-followup`
 
 ## Pitfalls

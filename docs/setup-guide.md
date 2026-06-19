@@ -243,7 +243,7 @@ hermes cron status
 **Health check always failing:**
 - Check that `/api/health` returns `{ "status": "ok" }` with HTTP 200
 - Check Vercel function logs in the dashboard
-- Check the URL saved in memory: retrieve `last-deployment`
+- Check the URL saved in memory: retrieve `last-deployment-url`
 
 **Build failing on Vercel but passing locally:**
 - Compare Node.js version: `node --version` vs Vercel project settings

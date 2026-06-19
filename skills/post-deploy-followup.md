@@ -16,13 +16,13 @@ Orchestrates the three post-deploy actions: health-check → log to memory → s
 
 ## Prerequisites
 
-- Deployment URL in Hermes memory (key: `last-deployment`) or provided directly
+- Deployment URL in Hermes memory (key: `last-deployment-url`) or provided directly
 - `health-check` skill available
 - `send-notification` skill available
 
 ## Procedure
 
-1. **Get URL** from Hermes memory key `last-deployment` or from user
+1. **Get URL** from Hermes memory key `last-deployment-url` or from user
 
 2. **Run `health-check`**
    - PASS → continue
