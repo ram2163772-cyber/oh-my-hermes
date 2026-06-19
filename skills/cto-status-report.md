@@ -16,6 +16,12 @@ Reads the full Hermes kanban and production health, then sends the founder a cle
 - When founder asks "what's going on?"
 - When CTO Agent detects a stalled task (> 4 hours in same column)
 
+## Prerequisites
+
+- Hermes kanban is available and initialized.
+- Hermes memory contains deployment and health logs if deployments have happened.
+- Founder notification channel is configured through `send-notification` or Hermes Gateway.
+
 ## Procedure
 
 1. **Read kanban state:**

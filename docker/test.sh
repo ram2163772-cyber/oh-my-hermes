@@ -17,7 +17,8 @@ for skill in \
   implement-with-claude-code implement-with-codex deploy-to-vercel connect-supabase \
   setup-monitoring health-check send-notification post-deploy-followup \
   manage-github-issues create-github-pr auto-issue-triage review-github-pr \
-  await-merge-approval kanban-task cto-status-report; do
+  await-merge-approval kanban-task cto-status-report backup-hermes-data \
+  security-review onboarding; do
   if [ -f "$HERMES_DIR/skills/$skill.md" ]; then
     ok "  skill: $skill"
   else
@@ -37,7 +38,7 @@ done
 
 echo ""
 echo "Agents:"
-for agent in cto pm dev qa ops; do
+for agent in cto pm dev qa ops security; do
   if [ -f "$HERMES_DIR/agents/$agent.md" ]; then
     ok "  agent: $agent"
   else
@@ -59,7 +60,7 @@ done
 
 echo ""
 echo "CLI tools:"
-for cmd in curl git jq gh vercel node npm; do
+for cmd in curl git jq gh vercel node npm rg ffmpeg; do
   if command -v $cmd &>/dev/null; then
     ok "  $cmd"
   else
@@ -69,7 +70,9 @@ done
 
 echo ""
 echo "Hermes commands (skipped in TEST_MODE — requires live Hermes install):"
-if command -v hermes &>/dev/null; then
+if [ "${TEST_MODE:-}" = "1" ]; then
+  echo "  [SKIP] TEST_MODE=1 — live Hermes runtime not required"
+elif command -v hermes &>/dev/null; then
   if hermes kanban --help &>/dev/null 2>&1; then
     ok "  hermes kanban"
   else

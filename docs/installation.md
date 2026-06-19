@@ -10,7 +10,13 @@ source ~/.bashrc   # or ~/.zshrc on macOS
 hermes             # confirm it opens
 ```
 
-Hermes v0.9+ required. Check version: `hermes --version`
+Use a current Hermes Agent build with `profile`, `cron`, and `kanban` commands available. Check with:
+
+```bash
+hermes profile --help
+hermes cron --help
+hermes kanban --help
+```
 
 ---
 
@@ -19,13 +25,13 @@ Hermes v0.9+ required. Check version: `hermes --version`
 **One-line:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourusername/oh-my-hermes/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/install.sh | bash
 ```
 
 **Clone and install:**
 
 ```bash
-git clone https://github.com/yourusername/oh-my-hermes
+git clone https://github.com/salomondiei08/oh-my-hermes
 cd oh-my-hermes
 bash install.sh
 ```
@@ -44,9 +50,10 @@ Expected output:
 ```
 [OK] Hermes found
 [OK] Skills directory: ~/.hermes/skills/
-[OK] 12 skills installed
+[OK] 23 skills installed
 [OK] Workflows directory: ~/.hermes/workflows/
-[OK] 3 workflows installed
+[OK] 5 workflows installed
+[OK] 6 agents installed
 Next: cd into your project and run the bootstrap script.
 ```
 
@@ -100,7 +107,7 @@ Never commit `.env.local`. Only `.env.example` (with placeholder values) is comm
 ## For LLM agents
 
 ```bash
-git clone https://github.com/yourusername/oh-my-hermes /tmp/oh-my-hermes
+git clone https://github.com/salomondiei08/oh-my-hermes /tmp/oh-my-hermes
 bash /tmp/oh-my-hermes/install.sh
 bash /tmp/oh-my-hermes/scripts/verify.sh
 cd /path/to/target/project

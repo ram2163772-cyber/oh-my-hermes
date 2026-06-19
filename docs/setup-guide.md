@@ -132,13 +132,13 @@ bash /path/to/oh-my-hermes/scripts/setup-cto.sh
 ```
 
 The script:
-- Creates Hermes profiles: `cto`, `pm`, `dev`, `qa`, `ops`
+- Creates Hermes profiles: `cto`, `pm`, `dev`, `qa`, `ops`, `security`
 - Injects each agent's role definition into its profile
 - Initializes the kanban board
 - Authenticates `gh` CLI using your token (no browser needed)
 - Warns if a gateway is already running (do not start duplicate gateways with the same bot token)
 - Saves your repo and username to Hermes memory
-- Sets up three cron jobs: hourly issue triage, 15-min health check, 9am daily report
+- Sets up four cron jobs: hourly issue triage, 15-min health check, 9am daily report, weekly security assessment
 
 Safe to re-run — it is idempotent.
 
@@ -198,10 +198,11 @@ Send approvals to me on Telegram.
 
 Hermes will:
 1. Save your repo and approval platform to memory
-2. Set up three cron jobs:
+2. Set up four cron jobs:
    - Hourly issue triage
    - 15-minute production health check
    - 9am daily status report
+   - 9am Monday security assessment
 3. Confirm and show you the kanban board
 
 ---
@@ -210,9 +211,11 @@ Hermes will:
 
 - Every hour: Hermes checks GitHub for new issues, scores them, picks the top one
 - When an issue is picked: Dev Agent implements it, creates a PR, QA Agent reviews it
+- Before approval: Security Agent reviews the PR and blocks critical or high findings
 - When QA passes: you get a Telegram/Slack message with a plain-English summary and a YES/NO prompt
 - You reply YES → it merges, deploys, health checks, and confirms back to you
 - You reply NO → tell it what to change, it iterates
+- Every Monday: Security Agent runs a supply chain assessment and sends a summary
 
 ---
 

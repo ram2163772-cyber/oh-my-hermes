@@ -1,15 +1,15 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV HERMES_DIR=/root/.hermes
+ENV HERMES_DIR=/home/hermes/.hermes
 
 RUN apt-get update && apt-get install -y \
-    curl git bash jq postgresql-client \
+    curl git bash jq postgresql-client ripgrep \
     ca-certificates gnupg lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Node.js 20
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+# Node.js 22
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -35,9 +35,15 @@ RUN ARCH=$(dpkg --print-architecture) \
     && rm /tmp/supabase.tar.gz \
     && supabase --version
 
+# Non-root user for runtime isolation
+RUN useradd -m -s /bin/bash hermes
+
 # Copy Oh My Hermes
 WORKDIR /oh-my-hermes
 COPY . .
-RUN chmod +x install.sh scripts/bootstrap.sh scripts/verify.sh docker/entrypoint.sh docker/test.sh
+RUN chmod +x install.sh scripts/bootstrap.sh scripts/verify.sh docker/entrypoint.sh docker/test.sh \
+    && chown -R hermes:hermes /oh-my-hermes
+
+USER hermes
 
 ENTRYPOINT ["/oh-my-hermes/docker/entrypoint.sh"]

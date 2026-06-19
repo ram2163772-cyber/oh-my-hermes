@@ -13,47 +13,65 @@ metadata:
 
 Creates and updates cards in the Hermes kanban board (`hermes kanban`). Every agent action that moves work forward must call this skill — the kanban is the source of truth the CTO reads via `hermes kanban watch`.
 
+## When to Use
+
+- A GitHub issue is accepted into the CTO loop.
+- An agent starts work, creates a PR, passes review, deploys, or gets blocked.
+- The founder needs current task state visible in the live board.
+
+## Prerequisites
+
+- Hermes v0.13+ for heartbeat and zombie recovery behavior.
+- Kanban initialized with `hermes kanban init`.
+- A concrete task title and verifiable acceptance criteria.
+- A target assignee profile such as `pm`, `dev`, `security`, `qa`, or `ops`.
+
 ## Kanban columns
 
 | Status | Meaning |
 |---|---|
-| Backlog | Triaged, not started |
-| In Progress | Dev Agent working on it |
-| Review | PR created, QA reviewing |
-| Awaiting Approval | QA passed, waiting for founder YES/NO |
-| Done | Merged and deployed |
-| Blocked | Stalled — needs human decision |
+| Triage | Raw idea or unclear issue, not ready for implementation |
+| Todo | Defined work waiting on dependencies or assignment |
+| Ready | Assigned work waiting for the dispatcher to spawn the worker |
+| Running | Worker profile is actively handling the task |
+| Blocked | Worker needs human input or the retry circuit breaker tripped |
+| Done | Completed with summary and handoff metadata |
 
 ## Procedure
 
 **Create a new task (PM Agent, after triaging an issue):**
 ```bash
-hermes kanban create "Fix: [what] — Issue #[n] | Priority: [score]"
+hermes kanban create "Fix: [what] — Issue #[n]" \
+  --assignee dev \
+  --priority [score] \
+  --body "Why: [one sentence]. Acceptance: [verifiable checks]."
 ```
 Or via agent toolset (preferred inside a skill):
 ```
-kanban_create title="Fix: [what]" description="Issue #[n] | Why: [one sentence] | Acceptance: [verifiable check, e.g. 'GET /api/health returns 200 AND existing tests pass']"
+kanban_create title="Fix: [what]" assignee="dev" body="Issue #[n] | Why: [one sentence] | Acceptance: [verifiable check, e.g. 'GET /api/health returns 200 AND existing tests pass']"
 ```
 
 Acceptance criteria must be a concrete, verifiable check — not "it works." If you cannot write a specific check, ask for clarification before creating the card.
 
 Save returned task ID to Hermes memory: key `task-id-issue-[n]`.
 
-**Claim and move to in-progress (Dev Agent):**
+**Claim and move to running (Dev Agent):**
 ```bash
-hermes kanban claim [task-id] --heartbeat 5m
+hermes kanban claim [task-id]
 hermes kanban comment [task-id] "Dev Agent started at [time]. Engine: [hermes/claude-code/codex]"
 ```
 
-`--heartbeat 5m` sends a keep-alive every 5 minutes. If the agent crashes or goes silent, Hermes v0.13+ detects a missed heartbeat (zombie detection) and auto-retries the task from backlog. Always use heartbeat for long-running implementation tasks.
+For long-running work, the worker should call `kanban_heartbeat(note="...")` every few minutes. If a worker crashes or stops heartbeating, Hermes reclaims the task and returns it to `ready` for retry.
 
-**Move to review (Dev Agent, after PR created):**
+**Hand off to security review (Dev Agent, after PR created):**
 ```bash
-hermes kanban comment [task-id] "PR #[number] created: [url]"
+hermes kanban complete [task-id] \
+  --summary "PR #[number] created: [url]. Implementation ready for security review." \
+  --metadata '{"pr_number":"[number]","pr_url":"[url]","next_assignee":"security"}'
 ```
-Then reassign to QA Agent.
+Then create or assign the next review task to Security Agent.
 
-**Move to awaiting-approval (QA Agent, after review passes):**
+**Record review passed (QA Agent, after review passes):**
 ```bash
 hermes kanban comment [task-id] "QA passed. Preview healthy. Approval sent to founder at [time]."
 ```
@@ -75,16 +93,17 @@ Then load `send-notification` — CTO Agent is alerted immediately.
 
 | Agent | Action | Command |
 |---|---|---|
-| PM | Issue triaged | `kanban_create` |
-| Dev | Starting work | `hermes kanban claim [id] --heartbeat 5m` |
-| Dev | PR created | `kanban_comment [id] "PR #n: url"` |
+| PM | Issue triaged | `kanban_create(..., assignee="dev")` |
+| Dev | Starting work | `hermes kanban claim [id]` |
+| Dev | Long-running work | `kanban_heartbeat(note="...")` |
+| Dev | PR created | `hermes kanban complete [id] --summary ... --metadata ...` |
 | QA | Review passed | `kanban_comment [id] "QA passed..."` |
 | Ops | Deployed healthy | `hermes kanban complete [id]` |
 | Any | Cannot proceed | `hermes kanban block [id]` |
 
 ## Zombie recovery (v0.13+)
 
-If a Dev Agent crashes mid-task, Hermes detects the missed heartbeat and moves the card back to Backlog automatically. The next agent that claims it gets a fresh start. No manual intervention needed unless the card is blocked 3+ times (Hermes surfaces this in `hermes kanban watch` as a stuck card).
+If a Dev Agent crashes mid-task, Hermes detects the missed heartbeat and moves the card back to `ready` automatically. The next worker that claims it gets the prior run history and can continue from the handoff context. No manual intervention is needed unless the card repeatedly blocks or the spawn circuit breaker gives up.
 
 ## Live monitoring
 
@@ -97,10 +116,11 @@ hermes kanban stats    # summary counts
 
 ## Pitfalls
 
-- Save the task ID to memory immediately after `kanban_create` — without it you cannot update the card later.
+- Save the task ID to memory immediately after `kanban_create` — without it you cannot update or link the card later.
 - Do not skip this skill. The kanban is how the CTO monitors the loop.
 - `hermes kanban complete` is final. For partial progress, use `kanban_comment` to log state.
 - Blocked cards are auto-surfaced in `hermes kanban watch`. Always add a comment explaining what is blocking before blocking the card.
+- Worker profiles should prefer `kanban_*` tool calls over shelling out to `hermes kanban` when the dispatcher spawned them.
 
 ## Verification
 

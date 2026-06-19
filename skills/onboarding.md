@@ -15,6 +15,16 @@ Guided conversational setup over chat. Asks one question at a time, explains eve
 - `github-repo` key is not in Hermes memory
 - First meaningful interaction after install
 
+## Prerequisites
+
+- Hermes Agent v0.9+ is installed and reachable.
+- `gh` is installed on the host where setup runs.
+- User can provide a GitHub repo, fine-grained token, production URL or `skip`, and daily report time.
+
+## Procedure
+
+Follow the steps below in order. Ask one question, wait for the answer, save the value to memory, then continue.
+
 ## Rules
 
 - One question per message. Wait for the answer before continuing.
@@ -138,3 +148,16 @@ Then load and run `auto-issue-triage` for the configured repo.
 | No open issues | "Nothing open right now. Create an issue on GitHub and I'll pick it up within the hour." |
 | Profile creation fails | "Run `hermes update` and message me again — your version may need an update." |
 | gh CLI not found | "Type `! brew install gh` in your terminal, then message me again." |
+
+## Pitfalls
+
+- Do not continue after a failed GitHub token check.
+- Do not reveal or repeat the token in chat, logs, or summaries.
+- Do not create duplicate gateway sessions for the same bot token.
+
+## Verification
+
+- `github-repo`, `github-username`, `production-url`, and `report-time` are saved in memory.
+- Profiles exist for `cto`, `pm`, `dev`, `qa`, `ops`, and `security`.
+- Cron entries exist for issue triage, health check, daily report, and weekly security assessment.
+- `hermes kanban list` succeeds after setup.

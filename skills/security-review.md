@@ -9,7 +9,22 @@ tags: [security, owasp, review, supply-chain]
 
 Two modes: PR review (every PR) and supply chain assessment (weekly). Blocks merges on critical findings.
 
-## PR review
+## When to Use
+
+- A PR is ready for review before founder approval.
+- The weekly supply chain assessment cron fires.
+- A change touches auth, payments, secrets, database access, dependencies, or logging.
+
+## Prerequisites
+
+- `GITHUB_TOKEN` with pull request read/write access.
+- `gh` authenticated for the target repository.
+- `npm audit` for Node projects or `pip-audit` for Python projects.
+- Current branch contains the PR diff to review.
+
+## Procedure
+
+### PR review
 
 Run in order. Stop and block if Critical found.
 
@@ -51,7 +66,7 @@ gh pr comment [number] --body "[security findings or 'Security: clean']"
 | Medium | PR comment only — fix before next sprint, does not block |
 | Clean | Hand off to `await-merge-approval` |
 
-## Supply chain assessment (weekly)
+### Supply chain assessment (weekly)
 
 1. `npm audit --audit-level=moderate` or `pip-audit`
 2. List direct deps and flag: publisher changed in last 30 days, name is a near-match of a popular package
@@ -69,6 +84,13 @@ Flag any of these in generated or reviewed code:
 | A05 Misconfiguration | `service_role` key client-side | Anon key client-side, service key server-only |
 | A07 Auth | No session expiry | Expiry set, tokens not stored in localStorage |
 | A09 Logging | `console.log(secret)` | Never log credentials or PII |
+
+## Pitfalls
+
+- Do not mark a PR clean without checking secrets, auth, input handling, logging, and changed dependencies.
+- Do not paste secrets or raw vulnerable payloads into PR comments.
+- Do not block on Medium findings unless project policy explicitly says Medium is blocking.
+- If audit tooling is unavailable, comment that the tool check did not run and perform the manual checks.
 
 ## Verification
 

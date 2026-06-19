@@ -1,11 +1,11 @@
 <img src="banner.png" alt="Oh My Hermes" width="100%" />
 
-# Oh My Hermes
+# OMH — Oh My Hermes
 
 [![Stars](https://img.shields.io/github/stars/salomondiei08/oh-my-hermes?style=flat-square)](https://github.com/salomondiei08/oh-my-hermes/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Hermes](https://img.shields.io/badge/Hermes-v0.13%2B-orange?style=flat-square)](https://hermes-agent.nousresearch.com)
-[![Skills](https://img.shields.io/badge/skills-23-brightgreen?style=flat-square)](#skills)
+[![Skills](https://img.shields.io/badge/skills-24-brightgreen?style=flat-square)](#skills)
 [![Agents](https://img.shields.io/badge/agents-6-blue?style=flat-square)](#agents)
 
 **An opinionated workflow layer for building, shipping, and operating apps — delivered directly to Hermes.**
@@ -16,51 +16,13 @@ Like Oh My Zsh is to Zsh. You install it once and Hermes becomes genuinely usefu
 
 ---
 
-## Use with an AI agent
+## Using with an AI agent
 
-If you work with Claude, Cursor, Copilot, or any coding assistant, paste this directly into the chat:
+If you work with Claude, Cursor, Copilot, or any coding assistant, follow the agent install protocol:
 
-**To install Oh My Hermes on a project:**
+[INSTALL_FOR_AGENTS.md](INSTALL_FOR_AGENTS.md)
 
-```
-Install Oh My Hermes on this project.
-
-1. Clone the repo: git clone https://github.com/salomondiei08/oh-my-hermes /tmp/oh-my-hermes
-2. Run the installer: bash /tmp/oh-my-hermes/install.sh
-3. Bootstrap this project: bash /tmp/oh-my-hermes/scripts/bootstrap.sh
-4. Verify everything installed: bash /tmp/oh-my-hermes/scripts/verify.sh
-
-Then tell me what's missing and what I need to fill in.
-```
-
-**To set up the full autonomous CTO loop:**
-
-```
-Set up the Oh My Hermes CTO loop for this project.
-
-Follow the instructions in: https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/INSTALL_FOR_AGENTS.md
-
-I will provide the following when you ask:
-- My GitHub repo (owner/repo)
-- A GitHub fine-grained token (I'll create one if you explain how)
-- My production URL (if deployed)
-
-Walk me through each step one at a time.
-```
-
-**To start a new app from scratch:**
-
-```
-Use Oh My Hermes to start a new app.
-
-Oh My Hermes is installed at ~/.hermes/skills/. Load the following skills in order:
-1. clarify-requirements — ask me the 7 questions and save my answers
-2. product-brief — generate the brief from my answers
-3. choose-engine — decide how to implement it
-4. implement — build it using the right engine
-
-Start with clarify-requirements now.
-```
+The file contains exact commands your agent can copy and run — prerequisites check, install, verify, bootstrap, and CTO loop setup.
 
 ---
 
@@ -101,7 +63,7 @@ You describe what you want in plain language — on Telegram, Slack, Discord, yo
 │                     │                │               │          │
 │              ┌──────▼────────────────▼───────────────▼──────┐   │
 │              │              Hermes Kanban                    │   │
-│              │   Backlog → In Progress → Review → Done       │   │
+│              │   Triage → Ready → Running → Blocked/Done     │   │
 │              └───────────────────────────────────────────────┘   │
 │                                                                 │
 │  Persistent memory · 23 skills · 5 workflows · cron jobs        │
@@ -152,9 +114,9 @@ Once configured, this runs every hour without you touching anything:
 ```
 GitHub issue opens
        ↓
-  PM Agent scores & triages  →  kanban: Backlog
+  PM Agent scores & triages  →  kanban: Ready, assignee=dev
        ↓
-  Dev Agent implements  →  kanban: In Progress
+  Dev Agent implements  →  kanban: Running
        ↓
   Security Agent: secret scan + OWASP check + CVE check
        ↓
@@ -240,21 +202,134 @@ The bot will ask for your GitHub repo, walk you through creating a token step by
 | `kanban-task` | Creates and updates Hermes kanban cards at every stage |
 | `cto-status-report` | Daily morning report: what's in progress, done, blocked |
 | `backup-hermes-data` | Tarballs `~/.hermes/` to S3, Dropbox, or local |
+| `rollback` | Rolls back Vercel production to previous deploy after health check failure — requires founder YES |
 
 ---
 
 ## Agents
 
-| Agent | Role | Kanban ownership |
-|---|---|---|
-| **CTO** | Orchestrates all agents, monitors kanban, reports to you daily | All columns |
-| **PM** | Triages GitHub issues, writes tickets, prioritizes backlog | Backlog |
-| **Dev** | Implements tickets, picks the right engine, creates PRs | In Progress |
-| **Security** | Scans every PR for secrets, OWASP issues, and CVEs | Between Dev and QA |
-| **QA** | Reviews PRs, runs health checks, writes founder summary | Review |
-| **Ops** | Deploys, monitors production, handles incidents | Done + monitoring |
+Six agents, each with a specific role, kanban ownership, and clear scope. Role definitions live in `agents/`. Running `scripts/setup-cto.sh` (or messaging "set up the CTO loop") creates all six profiles and makes them active.
 
-Role definitions live in `agents/`. Running `scripts/setup-cto.sh` (or messaging "set up the CTO loop") creates the actual Hermes profiles and makes the agents active.
+---
+
+### CTO — Chief Technology Officer
+
+The main Hermes session. Owns all kanban columns. Delegates work to sub-agents, monitors progress, and is the only one who talks to you.
+
+**What triggers it:** Every hour via cron, or when you send a message.
+
+**What it does:**
+- Watches the kanban continuously (`hermes kanban watch`)
+- Spawns PM, Dev, Security, QA, or Ops sub-agents as needed
+- Sends you a daily morning report (what shipped, what's stuck, what needs your input)
+- Escalates to you only when a human decision is needed — health check failure, task blocked twice, secret found in a diff, scope change
+- Makes the call when two sub-agents conflict
+
+**What it does NOT do:** Write code, merge PRs, or deploy anything directly.
+
+---
+
+### PM — Product Manager
+
+Owns triage and ready work. Converts raw GitHub issues into implementation-ready kanban cards assigned to `dev`.
+
+**What triggers it:** When new issues appear on GitHub or when the CTO spawns it for triage.
+
+**What it does:**
+- Reads open GitHub issues and scores them by impact and urgency (bug labels, comment activity, age, priority labels)
+- Writes kanban tickets with: a verb-based title, the business reason in one sentence, 2-4 testable acceptance criteria, and the linked issue number
+- Flags issues that are too vague — asks you for clarification rather than guessing
+- Pings you after 24h if a blocked or approval-waiting card has gone stale
+
+**What it does NOT do:** Implement anything, merge PRs, make architecture decisions, or guess at unclear requirements.
+
+---
+
+### Dev — Software Developer
+
+Owns running implementation work. Claims the top ready kanban ticket and builds it.
+
+**What triggers it:** When the PM Agent creates a ready card assigned to `dev` and the dispatcher starts work.
+
+**What it does:**
+- Claims the highest-priority ready ticket assigned to `dev`
+- Chooses the right engine for the task: Hermes terminal for ops/config, Codex for single-file bug fixes, Claude Code for multi-file features
+- Implements the change, commits after every logical unit of work
+- Never commits `.env` files, API keys, tokens, or credentials — scans `git diff --staged` before every commit
+- Creates a PR with a description drawn from memory and ticket context
+- Completes the implementation task with PR summary and metadata for Security/QA handoff
+
+**What it does NOT do:** Merge PRs, deploy to production, start a second ticket while one is in progress, or make product decisions.
+
+---
+
+### Security — Security Analyst
+
+Sits between Dev and QA on every PR. Runs weekly supply chain checks.
+
+**What triggers it:** Every time Dev creates a PR; Monday 9am cron for supply chain.
+
+**What it does on every PR:**
+- Scans the diff for hardcoded secrets (API keys, tokens, passwords, service role keys)
+- Flags dangerous patterns: `eval()`, raw SQL string concatenation, `dangerouslySetInnerHTML` without sanitization, `process.env` values logged to console
+- Checks for CVEs with `npm audit` / `pip-audit` — only when `package.json` or `requirements.txt` changed
+- Reviews auth flows and Supabase RLS policies when auth files are touched
+- OWASP Top 10 diff scan: broken access control, injection, weak crypto, missing auth, secrets in logs
+
+**What it does on Mondays:**
+- Lists all direct dependencies and their publishers
+- Flags publishers that changed in the last 30 days (account takeover risk)
+- Flags near-matches of popular package names (typosquatting)
+- Sends you a plain-English report: packages reviewed, flags, action required
+
+**Severity table:**
+
+| Level | Action |
+|---|---|
+| Critical | Block merge. Alert you immediately via Telegram. |
+| High | Block merge. Comment on PR with fix instructions for Dev. |
+| Medium | Comment on PR. Fix before next sprint. Does not block. |
+| Low | Log to memory. Include in weekly report. |
+
+**What it does NOT do:** Write code fixes (sends feedback to Dev instead), run SAST, pen tests, exploit simulations, or forensics. Does not run scans outside PR review and the weekly window.
+
+---
+
+### QA — Quality Assurance
+
+Owns product verification before a PR reaches you.
+
+**What triggers it:** When the Security Agent passes a PR and hands off for QA.
+
+**What it does:**
+- Reviews the PR diff for scope creep, leftover TODOs, and missing env vars in `.env.example`
+- Runs `gh pr checks` to verify the build passes
+- Runs a health check on the Vercel preview URL — HTTP 200, `status: ok`, under 3000ms
+- Verifies the changes actually match the acceptance criteria on the ticket
+- Writes a plain-English founder summary: what the user experiences differently, which functions changed (not filenames), build status, response time, preview link
+- Sends back to Dev with specific feedback if anything fails
+
+**What it does NOT do:** Merge PRs, implement fixes, or approve without running the health check.
+
+---
+
+### Ops — Operations
+
+Owns Done + active monitoring. Handles everything infrastructure.
+
+**What triggers it:** After QA approval, and on a 15-minute health-check cron.
+
+**What it does:**
+- Deploys to Vercel (production and preview)
+- Runs a three-layer health check after every deploy: app endpoint (`/api/health`), Supabase connection, Vercel logs scan
+- Monitors production every 15 minutes — checks HTTP status, response time, Supabase query latency, log errors
+- Pulls and scans Vercel logs hourly for 500s, crashes, and auth anomalies
+- Sends you a Slack/Telegram notification after every deploy and on any incident
+- On incident: retries once after 60 seconds, identifies which layer failed, pulls logs for context, alerts you in plain language — never pastes raw logs or stack traces
+- Offers to roll back if the last deploy was less than 2 hours ago; confirms with you before doing it
+- Holds all DB-touching operations during active Supabase incidents and resumes when the status page clears
+
+**What it does NOT do:** Write or edit application code, triage issues, manage PRs, or roll back without telling you first.
 
 ---
 

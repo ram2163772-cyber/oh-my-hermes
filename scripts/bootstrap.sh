@@ -100,8 +100,11 @@ VERCEL_TOKEN=your-vercel-token
 VERCEL_ORG_ID=your-vercel-org-id
 VERCEL_PROJECT_ID=your-vercel-project-id
 
-# Notifications
+# Notifications — at least one required for CTO loop alerts
 SLACK_WEBHOOK_URL=your-slack-webhook-url
+# Telegram: create bot via @BotFather, get chat ID by messaging @userinfobot
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_CHAT_ID=your-telegram-chat-id
 
 # Monitoring
 SENTRY_DSN=your-sentry-dsn

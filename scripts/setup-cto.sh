@@ -17,6 +17,26 @@ fail() { echo "  [FAIL] $1"; FAIL=$((FAIL+1)); }
 warn() { echo "  [WARN] $1"; WARN=$((WARN+1)); }
 step() { echo ""; echo "── $1"; }
 
+hermes_has_subcommand() {
+  local group="$1"
+  local subcommand="$2"
+
+  hermes "$group" "$subcommand" --help &>/dev/null && return 0
+  hermes "$group" --help 2>/dev/null | grep -Eq "(^|[[:space:]])$subcommand([[:space:],]|$)"
+}
+
+require_hermes_subcommand() {
+  local group="$1"
+  local subcommand="$2"
+  local label="$3"
+
+  if hermes_has_subcommand "$group" "$subcommand"; then
+    ok "$label"
+  else
+    fail "$label missing — update Hermes Agent or check: hermes $group --help"
+  fi
+}
+
 echo ""
 echo "Oh My Hermes — CTO Loop Setup"
 echo "══════════════════════════════"
@@ -32,6 +52,33 @@ if ! command -v hermes &>/dev/null; then
 fi
 ok "hermes: $(hermes --version 2>/dev/null || echo 'found')"
 
+PROFILE_CREATE_SUBCOMMAND=""
+if hermes_has_subcommand profile create; then
+  PROFILE_CREATE_SUBCOMMAND="create"
+elif hermes_has_subcommand profile new; then
+  PROFILE_CREATE_SUBCOMMAND="new"
+fi
+
+require_hermes_subcommand profile list "hermes profile list supported"
+if [ -n "$PROFILE_CREATE_SUBCOMMAND" ]; then
+  ok "hermes profile $PROFILE_CREATE_SUBCOMMAND supported"
+else
+  fail "hermes profile create/new missing — update Hermes Agent or check: hermes profile --help"
+fi
+require_hermes_subcommand profile use "hermes profile use supported"
+require_hermes_subcommand kanban list "hermes kanban list supported"
+require_hermes_subcommand kanban init "hermes kanban init supported"
+require_hermes_subcommand kanban watch "hermes kanban watch supported"
+require_hermes_subcommand cron list "hermes cron list supported"
+require_hermes_subcommand cron status "hermes cron status supported"
+require_hermes_subcommand cron add "hermes cron add supported"
+
+if [ "$FAIL" -gt 0 ]; then
+  echo ""
+  echo "Hermes runtime preflight failed. Fix missing command support and re-run."
+  exit 1
+fi
+
 if [ ! -d "$AGENTS_DIR" ]; then
   echo "[ERROR] ~/.hermes/agents/ not found — run install.sh first"
   exit 1
@@ -39,7 +86,7 @@ fi
 ok "~/.hermes/agents/ exists"
 
 MISSING_AGENTS=0
-for agent in cto pm dev qa ops; do
+for agent in cto pm dev qa ops security; do
   if [ -f "$AGENTS_DIR/$agent.md" ]; then
     ok "agent definition: $agent.md"
   else
@@ -61,12 +108,23 @@ for profile in cto pm dev qa ops security; do
   if hermes profile list 2>/dev/null | grep -qw "$profile"; then
     ok "profile '$profile' already exists"
   else
-    if hermes profile create "$profile" 2>/dev/null; then
-      ok "profile '$profile' created"
-    else
-      warn "Could not create profile '$profile' — check: hermes profile --help"
-      echo "         May need: hermes profile new $profile"
-    fi
+    case "$PROFILE_CREATE_SUBCOMMAND" in
+      create|new)
+        CREATE_ARGS=()
+        if [ "$profile" = "security" ]; then
+          CREATE_ARGS+=(--no-alias)
+        fi
+
+        if hermes profile "$PROFILE_CREATE_SUBCOMMAND" "$profile" "${CREATE_ARGS[@]}" 2>/dev/null; then
+          ok "profile '$profile' created"
+        else
+          warn "Could not create profile '$profile' — check: hermes profile --help"
+        fi
+        ;;
+      *)
+        warn "Could not create profile '$profile' — no supported profile create command"
+        ;;
+    esac
   fi
 done
 
@@ -169,18 +227,34 @@ fi
 # ── 7. Save config to memory ─────────────────────
 step "7. Saving config to Hermes memory"
 
+hermes_memory_set() {
+  local key="$1"
+  local value="$2"
+  # Try direct CLI first (cheaper, reliable); fall back to chat if not available
+  if hermes memory set "$key" "$value" &>/dev/null 2>&1; then
+    return 0
+  elif hermes chat -q "Save to memory: key=$key value=$value" --max-turns 2 &>/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 if [ -n "$GITHUB_REPO" ]; then
-  if hermes chat -q "Save to memory: key=github-repo value=$GITHUB_REPO" --max-turns 2 &>/dev/null; then
+  if hermes_memory_set "github-repo" "$GITHUB_REPO"; then
     ok "github-repo saved to memory"
   else
-    warn "Could not auto-save to memory. Tell Hermes manually:"
+    warn "Could not auto-save github-repo. Tell Hermes manually:"
     echo "         'remember that github-repo is $GITHUB_REPO'"
   fi
 fi
 
 if [ -n "$GITHUB_USERNAME" ]; then
-  hermes chat -q "Save to memory: key=github-username value=$GITHUB_USERNAME" --max-turns 2 &>/dev/null && \
-    ok "github-username saved to memory" || true
+  if hermes_memory_set "github-username" "$GITHUB_USERNAME"; then
+    ok "github-username saved to memory"
+  else
+    warn "Could not auto-save github-username"
+  fi
 fi
 
 # ── 8. Cron jobs ──────────────────────────────────

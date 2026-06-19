@@ -179,6 +179,29 @@ Templates in `templates/healthcheck/`. The `health-check` skill calls this endpo
 
 ---
 
+## Memory key registry
+
+Hermes memory is a shared key-value store. All skills and agents read and write to the same namespace. This table is the authoritative list of keys — if a skill needs to add a key, document it here first.
+
+| Key | Written by | Read by | Format | Description |
+|---|---|---|---|---|
+| `github-repo` | `setup-cto.sh`, `onboarding` | `auto-issue-triage`, `security-review`, `create-github-pr` | `owner/repo` string | GitHub repository under management |
+| `github-username` | `setup-cto.sh`, `onboarding` | `auto-issue-triage` | string | GitHub username for issue self-assignment |
+| `current-task` | `auto-issue-triage` | `auto-issue-triage`, CTO Agent | `{ issueNumber, taskId, title, assignedAt }` JSON | Currently in-progress issue; prevents parallel work |
+| `task-id-issue-[n]` | `auto-issue-triage` | `kanban-task` | string (kanban card ID) | Maps GitHub issue number to kanban card ID |
+| `triage-last-run` | `auto-issue-triage` | `auto-issue-triage` | ISO 8601 timestamp | Guards against over-frequent triage runs (cost control) |
+| `last-deployment-url` | `deploy-to-vercel` | `rollback`, `post-deploy-followup` | URL string | Most recent Vercel deployment URL |
+| `notification-log` | `send-notification` | CTO Agent (reporting) | Array of `{ event, timestamp, backend, delivered }` | Audit log of notifications sent |
+| `rollback-log` | `rollback` | CTO Agent (reporting) | Array of `{ rolledBackAt, fromUrl, reason, healthStatus }` | Audit log of production rollbacks |
+| `approval-platform` | `onboarding`, `setup-cto.sh` | `await-merge-approval`, `send-notification` | `telegram` \| `slack` \| `discord` | Where to send founder approval requests |
+
+**Rules:**
+- Never create a new memory key without adding it to this table
+- Keys are global across all agents — name collisions silently overwrite data
+- Use the exact key names listed — casing matters
+
+---
+
 ## Design principles
 
 **Hermes-native, not Hermes-wrapped.** Skills load into Hermes as first-class citizens. No wrapper process, proxy, or daemon.
