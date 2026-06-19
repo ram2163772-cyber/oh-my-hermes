@@ -23,7 +23,8 @@ git clone https://github.com/salomondiei08/oh-my-hermes /tmp/oh-my-hermes
 bash /tmp/oh-my-hermes/install.sh
 ```
 
-Installs 30 skills, 5 workflows, and 7 agent role definitions into `~/.hermes/`.
+Installs 36 skills, 6 workflows, 7 agent role definitions, and helper scripts
+into `~/.hermes/`.
 
 ---
 
@@ -46,6 +47,13 @@ bash /tmp/oh-my-hermes/scripts/bootstrap.sh
 ```
 
 Creates `AGENTS.md`, `.env.example`, and `src/app/api/health/route.ts`.
+
+For a brand-new server, prefer the installed server bootstrap:
+
+```bash
+bash ~/.hermes/scripts/server-bootstrap.sh --project myapp --repo owner/repo --telegram
+bash ~/.hermes/scripts/status.sh
+```
 
 ---
 
@@ -81,9 +89,10 @@ verify it before shipping, and ask only at irreversible boundaries.
 
 | Path | Contents |
 |---|---|
-| `~/.hermes/skills/` | 30 skills — complete product lifecycle + CTO loop |
-| `~/.hermes/workflows/` | 5 workflows |
+| `~/.hermes/skills/` | 36 skills — complete product lifecycle + CTO loop |
+| `~/.hermes/workflows/` | 6 workflows |
 | `~/.hermes/agents/` | 7 agent role definitions |
+| `~/.hermes/scripts/` | setup, status, project switch, reset, dead-letter helpers |
 | `~/.hermes/profiles/` | 7 active profiles (after setup-cto.sh) |
 
 ---
