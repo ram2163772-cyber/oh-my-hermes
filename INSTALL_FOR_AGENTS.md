@@ -22,7 +22,7 @@ https://hermes-agent.nousresearch.com/docs/getting-started/quickstart
 curl -fsSL https://raw.githubusercontent.com/salomondiei08/oh-my-hermes/main/install.sh | bash
 ```
 
-Installs 22 skills, 5 workflows, and 6 agent role definitions into `~/.hermes/`.
+Installs 30 skills, 5 workflows, and 7 agent role definitions into `~/.hermes/`.
 
 ---
 
@@ -59,7 +59,9 @@ export PRODUCTION_URL=<https://yourapp.vercel.app>   # optional
 bash /tmp/oh-my-hermes/scripts/setup-cto.sh
 ```
 
-Creates Hermes profiles (cto, pm, dev, qa, ops, security), initializes kanban, schedules 4 cron jobs.
+Creates Hermes profiles (cto, pm, designer, dev, qa, security, ops), initializes
+kanban, and schedules available product, health, logs, report, and security jobs
+without duplicating existing named jobs.
 
 ---
 
@@ -68,7 +70,8 @@ Creates Hermes profiles (cto, pm, dev, qa, ops, security), initializes kanban, s
 In Hermes, run:
 
 ```
-/goal Manage [owner/repo] as CTO. Triage issues hourly, implement top priority, get founder approval before merging. Never ship without YES.
+/goal Build, launch, operate, and improve [product]. Keep one outcome active,
+verify it before shipping, and ask only at irreversible boundaries.
 ```
 
 ---
@@ -77,10 +80,10 @@ In Hermes, run:
 
 | Path | Contents |
 |---|---|
-| `~/.hermes/skills/` | 22 skills — full app lifecycle + CTO loop |
+| `~/.hermes/skills/` | 30 skills — complete product lifecycle + CTO loop |
 | `~/.hermes/workflows/` | 5 workflows |
-| `~/.hermes/agents/` | 6 agent role definitions |
-| `~/.hermes/profiles/` | 6 active profiles (after setup-cto.sh) |
+| `~/.hermes/agents/` | 7 agent role definitions |
+| `~/.hermes/profiles/` | 7 active profiles (after setup-cto.sh) |
 
 ---
 
