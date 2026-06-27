@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    container_name: hindsight
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:9999:9999"
+    volumes:
+      - hindsight-pg0:/home/hindsight/.pg0
+    environment:
+      # LLM for fact extraction
+      - HINDSIGHT_API_LLM_API_KEY=***WILL_BE_INJECTED_FROM_ENV***
+      - HINDSIGHT_API_LLM_BASE_URL=https://api.vultrinference.com/v1
+      - HINDSIGHT_API_LLM_MODEL=deepseek-ai/DeepSeek-V4-Flash
+      # Reranker: Flashrank ONNX (fast, no PyTorch) + limit candidates to 20
+      - HINDSIGHT_API_RERANKER_PROVIDER=flashrank
+      - HINDSIGHT_API_RERANKER_FLASHRANK_MODEL=ms-marco-MiniLM-L-12-v2
+      - HINDSIGHT_API_RERANKER_FLASHRANK_CPU_MEM_ARENA=false
+      - HINDSIGHT_API_RERANKER_MAX_CANDIDATES=20
+      # API
+      - HINDSIGHT_ENABLE_API=true
+      - HINDSIGHT_ENABLE_CP=true
+      - HINDSIGHT_API_HOST=0.0.0.0
+      - HINDSIGHT_API_PORT=8888
+      # Workers - reduced to avoid CPU starvation on 4-core VPS
+      - HINDSIGHT_WORKER_SLOTS=4
+      - HINDSIGHT_CONSOLIDATION_BATCH_SIZE=8
+      # Misc
+      - PYTHONUNBUFFERED=1
+      - TRANSFORMERS_VERBOSITY=error
+      - HF_HUB_VERBOSITY=error
+
+volumes:
+  hindsight-pg0:
+    external: true
